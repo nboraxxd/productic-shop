@@ -57,6 +57,11 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      fontFamily: {
+        arimo: ['var(--font-arimo)'],
+        nunito: ['var(--font-nunito)'],
+        kanit: ['var(--font-kanit)'],
+      },
     },
   },
   plugins: [tailwindcssAnimate],
