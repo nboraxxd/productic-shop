@@ -1,3 +1,26 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "next/core-web-vitals",
+    "standard",
+    "plugin:tailwindcss/recommended",
+    "prettier",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@tanstack/query/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+    "camelcase": "off",
+    "no-extra-semi": "off",
+    "tailwindcss/no-custom-classname": ["warn", { "whitelist": ["toaster"] }]
+  },
+  "settings": {
+    "tailwindcss": {
+      "callees": ["cn", "className"],
+      "classRegex": ".*[Cc]lass[Nn]ame.*"
+    }
+  }
 }
