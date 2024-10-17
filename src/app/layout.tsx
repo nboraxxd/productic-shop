@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { Roboto } from 'next/font/google'
 
 import { Toaster } from '@/components/ui/sonner'
-import { ThemeProvider } from '@/components/provider/theme-provider'
-import { TanstackQueryProvider } from '@/components/provider'
+import { TanstackQueryProvider, AuthProvider, ThemeProvider } from '@/components/provider'
 import { Header } from '@/components/shared'
 import '@/app/globals.css'
 
@@ -24,13 +24,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const cookieStore = cookies()
+  const sessionToken = cookieStore.get('sessionToken')
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} ${roboto.variable} antialiased`}>
         <TanstackQueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Header />
-            {children}
+            <AuthProvider initialSessionToken={sessionToken?.value}>
+              <Header />
+              {children}
+            </AuthProvider>
             <Toaster />
           </ThemeProvider>
         </TanstackQueryProvider>

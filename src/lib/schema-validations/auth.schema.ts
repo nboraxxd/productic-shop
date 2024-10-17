@@ -54,10 +54,9 @@ export const setTokenBodySchema = z
 
 export type SetTokenBodyType = z.infer<typeof setTokenBodySchema>
 
-export const setTokenResponseSchema = z.object({
-  message: z.string(),
+export const setTokenDataResponseSchema = z.object({
   token: z.string(),
   expiresAt: z.string(),
 })
 
-export type SetTokenResponseType = z.infer<typeof setTokenResponseSchema>
+export type SetTokenDataResponseType = z.infer<typeof setTokenDataResponseSchema>

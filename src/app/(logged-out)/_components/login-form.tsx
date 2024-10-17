@@ -9,7 +9,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { SuccessResponse } from '@/types'
 import envVariables from '@/lib/schema-validations/env-variables.schema'
-import { LoginDataResponseType, LoginSchemaType, loginSchema } from '@/lib/schema-validations/auth.schema'
+import {
+  LoginDataResponseType,
+  LoginSchemaType,
+  SetTokenDataResponseType,
+  loginSchema,
+} from '@/lib/schema-validations/auth.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -56,7 +61,7 @@ function LoginFormWithoutSuspense() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(omit(result.payload.data, 'account')),
-      }).then(async (res) => {
+      }).then<{ status: number; payload: SuccessResponse<SetTokenDataResponseType> }>(async (res) => {
         const payload = await res.json()
 
         const data = { status: res.status, payload }
@@ -65,10 +70,11 @@ function LoginFormWithoutSuspense() {
 
         return data
       })
-      console.log('🔥 ~ onValid ~ resultFromNextServer:', resultFromNextServer)
+      console.log('🔥 ~ onValid ~ resultFromNextServer:', resultFromNextServer.payload.data)
 
       form.reset()
       router.push('/')
+      router.refresh()
     } catch (error: any) {
       const status = error.status
 

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       expires: new Date(parsedData.expiresAt),
     })
 
-    return Response.json({ message: 'Set token success', ...parsedData })
+    return Response.json({ message: 'Set token success', data: parsedData })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return Response.json(
