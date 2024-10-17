@@ -10,7 +10,7 @@ export const RegisterSchema = z
     password,
     confirmPassword: z.string().min(6).max(100),
   })
-  .strict()
+  .strict('Additional properties not allowed')
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (password !== confirmPassword) {
       ctx.addIssue({
@@ -21,10 +21,12 @@ export const RegisterSchema = z
     }
   })
 
-export const LoginSchema = z.object({
-  email,
-  password,
-})
+export const LoginSchema = z
+  .object({
+    email,
+    password,
+  })
+  .strict('Additional properties not allowed')
 
 export type RegisterSchemaType = z.infer<typeof RegisterSchema>
 export type LoginSchemaType = z.infer<typeof LoginSchema>

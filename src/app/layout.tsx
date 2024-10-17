@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 
+import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from '@/components/provider/theme-provider'
 import { TanstackQueryProvider } from '@/components/provider'
 import { Header } from '@/components/shared'
@@ -30,6 +31,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Header />
             {children}
+            <Toaster />
           </ThemeProvider>
         </TanstackQueryProvider>
       </body>
