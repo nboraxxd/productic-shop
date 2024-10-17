@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import envVariables from '@/lib/schema-validations/env-variables.schema'
-import { RegisterSchema, RegisterSchemaType } from '@/lib/schema-validations/auth.schema'
+import { registerSchema, RegisterSchemaType } from '@/lib/schema-validations/auth.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -23,7 +23,7 @@ function RegisterFormWithoutSuspense() {
   // const next = searchParams.get('next')
 
   const form = useForm<RegisterSchemaType>({
-    resolver: zodResolver(RegisterSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',

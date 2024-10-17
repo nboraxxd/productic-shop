@@ -1,7 +1,17 @@
 import { z } from 'zod'
 
-export const UpdateMeSchema = z.object({
-  name: z.string().trim().min(2).max(256),
+export const accountDataResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
 })
 
-export type UpdateMeSchemaType = z.TypeOf<typeof UpdateMeSchema>
+export type AccountDataResponseType = z.TypeOf<typeof accountDataResponseSchema>
+
+export const updateMeSchema = z
+  .object({
+    name: z.string().trim().min(2).max(256),
+  })
+  .strict('Additional properties not allowed')
+
+export type UpdateMeSchemaType = z.TypeOf<typeof updateMeSchema>

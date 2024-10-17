@@ -1,9 +1,10 @@
+import { accountDataResponseSchema } from '@/lib/schema-validations/account.schema'
 import { z } from 'zod'
 
 const email = z.string().email()
 const password = z.string().min(6).max(100)
 
-export const RegisterSchema = z
+export const registerSchema = z
   .object({
     name: z.string().min(2).max(255),
     email,
@@ -21,12 +22,42 @@ export const RegisterSchema = z
     }
   })
 
-export const LoginSchema = z
+export type RegisterSchemaType = z.infer<typeof registerSchema>
+
+export const registerDataResponseSchema = z.object({
+  token: z.string(),
+  expiresAt: z.string(),
+  account: accountDataResponseSchema,
+})
+
+export type RegisterDataResponseType = z.infer<typeof registerDataResponseSchema>
+
+export const loginSchema = z
   .object({
     email,
     password,
   })
   .strict('Additional properties not allowed')
 
-export type RegisterSchemaType = z.infer<typeof RegisterSchema>
-export type LoginSchemaType = z.infer<typeof LoginSchema>
+export type LoginSchemaType = z.infer<typeof loginSchema>
+
+export const loginDataResponseSchema = registerDataResponseSchema
+
+export type LoginDataResponseType = z.infer<typeof loginDataResponseSchema>
+
+export const setTokenBodySchema = z
+  .object({
+    token: z.string(),
+    expiresAt: z.string(),
+  })
+  .strict('Additional properties not allowed')
+
+export type SetTokenBodyType = z.infer<typeof setTokenBodySchema>
+
+export const setTokenResponseSchema = z.object({
+  message: z.string(),
+  token: z.string(),
+  expiresAt: z.string(),
+})
+
+export type SetTokenResponseType = z.infer<typeof setTokenResponseSchema>
