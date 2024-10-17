@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 
+import { ThemeProvider } from '@/components/provider/theme-provider'
 import { TanstackQueryProvider } from '@/components/provider'
+import { Header } from '@/components/shared'
 import '@/app/globals.css'
 
 export const metadata: Metadata = {
@@ -22,9 +24,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} ${roboto.variable} antialiased`}>
-        <TanstackQueryProvider>{children}</TanstackQueryProvider>
+        <TanstackQueryProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Header />
+            {children}
+          </ThemeProvider>
+        </TanstackQueryProvider>
       </body>
     </html>
   )
