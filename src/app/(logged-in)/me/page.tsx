@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import envVariables from '@/lib/schema-validations/env-variables.schema'
 import { Button } from '@/components/ui/button'
+import accountApi from '@/api-requests/account.api'
+import { AccountDataResponseType } from '@/lib/schema-validations/account.schema'
 
 export const metadata: Metadata = {
   title: 'Me',
@@ -12,30 +12,19 @@ export const metadata: Metadata = {
 }
 
 export default async function MePage() {
-  const cookieStore = cookies()
-  const sessionToken = cookieStore.get('sessionToken')
+  let meData: AccountDataResponseType | null = null
 
-  if (!sessionToken) redirect('/login')
+  try {
+    const result = await accountApi.getMeFromServerToBackend()
 
-  const result = await fetch(`${envVariables.NEXT_PUBLIC_API_ENDPOINT}/account/me`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${sessionToken?.value}`,
-    },
-  }).then(async (res) => {
-    const payload = await res.json()
-
-    const data = { status: res.status, payload }
-
-    if (!res.ok) throw data
-
-    return data
-  })
-  console.log('🔥 ~ MePage ~ result:', result)
+    meData = result.payload.data
+  } catch (_err) {
+    redirect('/login')
+  }
 
   return (
     <div>
-      <h1>Hello {result.payload.data.name} (server)</h1>
+      <h1>Hello {meData.name} (server)</h1>
       <Button asChild>
         <Link href="/me/update">Update me</Link>
       </Button>

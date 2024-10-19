@@ -14,3 +14,9 @@ export type SuccessResponse<D> = {
   message: string
   data: D
 }
+
+export const TokenType = {
+  ForgotPasswordToken: 'forgotPasswordToken',
+  EmailVerifyToken: 'emailVerifyToken',
+  SessionToken: 'sessionToken',
+} as const

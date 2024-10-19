@@ -1,5 +1,6 @@
 'use client'
 
+import { redirect } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { SuccessResponse } from '@/types'
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<AccountDataResponseType | null>(null)
 
   const sessionToken = useAuthStore((state) => state.sessionToken)
+  if (!sessionToken) redirect('/login')
 
   useEffect(() => {
     if (sessionToken) {

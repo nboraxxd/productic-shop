@@ -2,28 +2,32 @@
 
 import { toast } from 'sonner'
 import { Suspense } from 'react'
+import queryString from 'query-string'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
+import { LoaderCircleIcon } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import envVariables from '@/lib/schema-validations/env-variables.schema'
-import { registerSchema, RegisterSchemaType } from '@/lib/schema-validations/auth.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import AuthFormSkeleton from '@/app/(logged-out)/_components/auth-form-skeleton'
+
+import { useAuthStore } from '@/lib/stores/auth-store'
+import { useAuthRegisterMutation } from '@/app/(logged-out)/hooks'
+import { registerBodySchema, RegisterBodyType } from '@/lib/schema-validations/auth.schema'
+import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
 function RegisterFormWithoutSuspense() {
   const router = useRouter()
 
-  // const pathname = usePathname()
-  // const from = queryString.stringify({ from: pathname })
+  const pathname = usePathname()
+  const from = queryString.stringify({ from: pathname })
 
-  // const searchParams = useSearchParams()
-  // const next = searchParams.get('next')
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next')
 
-  const form = useForm<RegisterSchemaType>({
-    resolver: zodResolver(registerSchema),
+  const form = useForm<RegisterBodyType>({
+    resolver: zodResolver(registerBodySchema),
     defaultValues: {
       name: '',
       email: '',
@@ -32,27 +36,21 @@ function RegisterFormWithoutSuspense() {
     },
   })
 
-  async function onValid(values: RegisterSchemaType) {
+  const authRegisterMutation = useAuthRegisterMutation()
+  const setSessionToken = useAuthStore((state) => state.setSessionToken)
+
+  async function onValid(values: RegisterBodyType) {
+    if (authRegisterMutation.isPending) return
+
     try {
-      const result = await fetch(`${envVariables.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      }).then(async (res) => {
-        const payload = await res.json()
+      const response = await authRegisterMutation.mutateAsync(values)
 
-        const data = { status: res.status, payload }
+      setSessionToken(response.payload.data.token)
 
-        if (!res.ok) throw data
-
-        return data
-      })
-      console.log('🔥 ~ register ~ result:', result)
+      router.push(next ? `${next}?${from}` : '/me')
+      router.refresh()
 
       form.reset()
-      router.push('/')
     } catch (error: any) {
       const status = error.status
 
@@ -60,7 +58,7 @@ function RegisterFormWithoutSuspense() {
         const errors = error.payload?.errors as { field: string; message: string }[]
 
         errors.forEach(({ field, message }) => {
-          form.setError(field as keyof RegisterSchemaType, { type: 'server', message })
+          form.setError(field as keyof RegisterBodyType, { type: 'server', message })
         })
       } else {
         toast.error(error.payload?.message || error.toString())
@@ -142,8 +140,8 @@ function RegisterFormWithoutSuspense() {
         />
 
         {/* Button */}
-        <Button type="submit" className="mt-2 gap-2">
-          {/* {status === ServiceStatus.pending ? <LoaderCircle className="ml-2 animate-spin" /> : null} */}
+        <Button type="submit" className="mt-2 gap-2" disabled={authRegisterMutation.isPending}>
+          {authRegisterMutation.isPending ? <LoaderCircleIcon className="ml-2 animate-spin" /> : null}
           Register
         </Button>
       </form>

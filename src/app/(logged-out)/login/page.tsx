@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 
 import { VercelLogoIcon } from '@radix-ui/react-icons'
-import { LoginForm, RedirectAuthLink } from '@/app/(logged-out)/_components'
+import { LoginForm, RedirectAuthLink } from '@/app/(logged-out)/components'
 
 export const metadata: Metadata = {
   title: 'Login',

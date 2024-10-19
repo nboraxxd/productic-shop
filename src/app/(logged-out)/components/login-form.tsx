@@ -1,88 +1,63 @@
 'use client'
 
-import omit from 'lodash/omit'
 import { toast } from 'sonner'
 import { Suspense } from 'react'
+import queryString from 'query-string'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
+import { LoaderCircleIcon } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { SuccessResponse } from '@/types'
-import envVariables from '@/lib/schema-validations/env-variables.schema'
-import {
-  LoginDataResponseType,
-  LoginSchemaType,
-  SetTokenDataResponseType,
-  loginSchema,
-} from '@/lib/schema-validations/auth.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import AuthFormSkeleton from '@/app/(logged-out)/_components/auth-form-skeleton'
+
+import { useAuthStore } from '@/lib/stores/auth-store'
+import { useAuthLoginMutation } from '@/app/(logged-out)/hooks'
+import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.schema'
+import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
 function LoginFormWithoutSuspense() {
   const router = useRouter()
 
-  // const pathname = usePathname()
-  // const from = queryString.stringify({ from: pathname })
+  const pathname = usePathname()
+  const from = queryString.stringify({ from: pathname })
 
-  // const searchParams = useSearchParams()
-  // const next = searchParams.get('next')
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next')
 
-  const form = useForm<LoginSchemaType>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<LoginBodyType>({
+    resolver: zodResolver(loginBodySchema),
     defaultValues: {
       email: '',
       password: '',
     },
   })
 
-  async function onValid(values: LoginSchemaType) {
+  const authLoginMutation = useAuthLoginMutation()
+  const setSessionToken = useAuthStore((state) => state.setSessionToken)
+
+  async function onValid(values: LoginBodyType) {
+    if (authLoginMutation.isPending) return
+
     try {
-      const result = await fetch(`${envVariables.NEXT_PUBLIC_API_ENDPOINT}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      }).then<{ status: number; payload: SuccessResponse<LoginDataResponseType> }>(async (res) => {
-        const payload = await res.json()
+      const response = await authLoginMutation.mutateAsync(values)
 
-        const data = { status: res.status, payload }
+      setSessionToken(response.payload.data.token)
 
-        if (!res.ok) throw data
-
-        return data
-      })
-
-      const resultFromNextServer = await fetch('/api/auth/set-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(omit(result.payload.data, 'account')),
-      }).then<{ status: number; payload: SuccessResponse<SetTokenDataResponseType> }>(async (res) => {
-        const payload = await res.json()
-
-        const data = { status: res.status, payload }
-
-        if (!res.ok) throw data
-
-        return data
-      })
-      console.log('🔥 ~ onValid ~ resultFromNextServer:', resultFromNextServer.payload.data)
+      router.push(next ? `${next}?${from}` : '/me')
+      router.refresh()
 
       form.reset()
-      router.push('/')
-      router.refresh()
     } catch (error: any) {
+      console.log('🔥 ~ onValid ~ error:', error)
       const status = error.status
 
       if (status === 422) {
         const errors = error.payload?.errors as { field: string; message: string }[]
 
         errors.forEach(({ field, message }) => {
-          form.setError(field as keyof LoginSchemaType, { type: 'server', message })
+          form.setError(field as keyof LoginBodyType, { type: 'server', message })
         })
       } else {
         toast.error(error.payload?.message || error.toString())
@@ -129,8 +104,8 @@ function LoginFormWithoutSuspense() {
         />
 
         {/* Button */}
-        <Button type="submit" className="mt-2 gap-2">
-          {/* {status === false ? <LoaderCircle className="ml-2 animate-spin" /> : null} */}
+        <Button type="submit" className="mt-2 gap-2" disabled={authLoginMutation.isPending}>
+          {authLoginMutation.isPending ? <LoaderCircleIcon className="ml-2 animate-spin" /> : null}
           Login
         </Button>
       </form>
