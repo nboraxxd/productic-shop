@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
-import { useAuthStore } from '@/lib/stores/auth-store'
 import { useAuthLoginMutation } from '@/app/(logged-out)/hooks'
 import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
@@ -35,22 +34,18 @@ function LoginFormWithoutSuspense() {
   })
 
   const authLoginMutation = useAuthLoginMutation()
-  const setSessionToken = useAuthStore((state) => state.setSessionToken)
 
   async function onValid(values: LoginBodyType) {
     if (authLoginMutation.isPending) return
 
     try {
-      const response = await authLoginMutation.mutateAsync(values)
-
-      setSessionToken(response.payload.data.token)
+      await authLoginMutation.mutateAsync(values)
 
       router.push(next ? `${next}?${from}` : '/me')
       router.refresh()
 
       form.reset()
     } catch (error: any) {
-      console.log('🔥 ~ onValid ~ error:', error)
       const status = error.status
 
       if (status === 422) {

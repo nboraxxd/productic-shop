@@ -1,6 +1,8 @@
+import omit from 'lodash/omit'
+
+import { addLeadingSlash, isBrowser } from '@/utils'
 import envVariables from '@/lib/schema-validations/env-variables.schema'
-import { addLeadingSlash } from '@/utils'
-import { omit } from 'lodash'
+import { AuthResponseType } from '@/lib/schema-validations/auth.schema'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string
@@ -24,14 +26,45 @@ class HttpError extends Error {
   }
 }
 
+class SessionToken {
+  private token: string | null = null
+  private _expiresAt = new Date().toISOString()
+
+  get value() {
+    return this.token
+  }
+
+  set value(token: string | null) {
+    if (!isBrowser) {
+      throw new Error('Cannot set token on server side')
+    }
+    this.token = token
+  }
+
+  get expiresAt() {
+    return this._expiresAt
+  }
+
+  set expiresAt(expiresAt: string) {
+    if (!isBrowser) {
+      throw new Error('Cannot set expiresAt on server side')
+    }
+    this._expiresAt = expiresAt
+  }
+}
+
+export const clientSessionToken = new SessionToken()
+
 const request = async <T>(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   url: string,
   options?: CustomOptions
 ) => {
   const body = options?.body ? JSON.stringify(options.body) : undefined
+
   const baseHeaders: HeadersInit = {
     'Content-Type': 'application/json',
+    Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : '',
   }
 
   // Nếu không truyền base URL thì mặc định sẽ là backend endpoint
@@ -59,8 +92,16 @@ const request = async <T>(
     payload,
   }
 
+  // Interceptors error
   if (!response.ok) {
     throw new HttpError(data)
+  }
+
+  // Interceptors response
+  if (isBrowser && ['/auth/login', '/auth/register'].includes(addLeadingSlash(url))) {
+    clientSessionToken.value = (payload as AuthResponseType).data.token
+  } else if (isBrowser && addLeadingSlash(url) === '/auth/logout') {
+    clientSessionToken.value = null
   }
 
   return data

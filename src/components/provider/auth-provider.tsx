@@ -1,15 +1,21 @@
 'use client'
 
-import { useAuthStore } from '@/lib/stores/auth-store'
+import { useState } from 'react'
+
+import { isBrowser } from '@/utils'
+import { clientSessionToken } from '@/utils/http'
 
 interface Props {
   children: React.ReactNode
   initialSessionToken?: string
 }
 
-export default function AuthProvider({ children, initialSessionToken = '' }: Props) {
-  const setSessionToken = useAuthStore((state) => state.setSessionToken)
+export default function AuthProvider({ children, initialSessionToken }: Props) {
+  useState(() => {
+    if (isBrowser && initialSessionToken) {
+      clientSessionToken.value = initialSessionToken
+    }
+  })
 
-  setSessionToken(initialSessionToken)
   return children
 }

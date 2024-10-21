@@ -1,5 +1,7 @@
-import { accountDataResponseSchema } from '@/lib/schema-validations/account.schema'
 import { z } from 'zod'
+
+import { SuccessResponse } from '@/types'
+import { accountDataResponseSchema } from '@/lib/schema-validations/account.schema'
 
 const email = z.string().email()
 const password = z.string().min(6).max(100)
@@ -31,6 +33,7 @@ export const authDataResponseSchema = z.object({
 })
 
 export type AuthDataResponseType = z.infer<typeof authDataResponseSchema>
+export type AuthResponseType = SuccessResponse<AuthDataResponseType>
 
 export const loginBodySchema = z
   .object({

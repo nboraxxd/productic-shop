@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
-import { useAuthStore } from '@/lib/stores/auth-store'
 import { useAuthRegisterMutation } from '@/app/(logged-out)/hooks'
 import { registerBodySchema, RegisterBodyType } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
@@ -37,15 +36,12 @@ function RegisterFormWithoutSuspense() {
   })
 
   const authRegisterMutation = useAuthRegisterMutation()
-  const setSessionToken = useAuthStore((state) => state.setSessionToken)
 
   async function onValid(values: RegisterBodyType) {
     if (authRegisterMutation.isPending) return
 
     try {
-      const response = await authRegisterMutation.mutateAsync(values)
-
-      setSessionToken(response.payload.data.token)
+      await authRegisterMutation.mutateAsync(values)
 
       router.push(next ? `${next}?${from}` : '/me')
       router.refresh()

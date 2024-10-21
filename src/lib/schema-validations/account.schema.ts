@@ -1,3 +1,4 @@
+import { SuccessResponse } from '@/types'
 import { z } from 'zod'
 
 export const accountDataResponseSchema = z.object({
@@ -7,6 +8,7 @@ export const accountDataResponseSchema = z.object({
 })
 
 export type AccountDataResponseType = z.TypeOf<typeof accountDataResponseSchema>
+export type AccountResponseType = SuccessResponse<AccountDataResponseType>
 
 export const updateMeSchema = z
   .object({

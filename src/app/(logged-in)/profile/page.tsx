@@ -1,44 +1,12 @@
 'use client'
 
-import { redirect } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-import { SuccessResponse } from '@/types'
-import { useAuthStore } from '@/lib/stores/auth-store'
-import envVariables from '@/lib/schema-validations/env-variables.schema'
-import { AccountDataResponseType } from '@/lib/schema-validations/account.schema'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAccountQuery } from '@/app/(logged-in)/hooks/use-account'
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<AccountDataResponseType | null>(null)
+  const { data, isLoading, isSuccess } = useAccountQuery()
 
-  const sessionToken = useAuthStore((state) => state.sessionToken)
-  if (!sessionToken) redirect('/login')
+  if (isLoading) return <Skeleton className="h-5 w-1/6" />
 
-  useEffect(() => {
-    if (sessionToken) {
-      ;(async () => {
-        const result = await fetch(`${envVariables.NEXT_PUBLIC_API_ENDPOINT}/account/me`, {
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        }).then<{ status: number; payload: SuccessResponse<AccountDataResponseType> }>(async (res) => {
-          const payload = await res.json()
-          const data = {
-            status: res.status,
-            payload,
-          }
-
-          if (!res.ok) {
-            throw data
-          }
-
-          return data
-        })
-
-        setProfile(result.payload.data)
-      })()
-    }
-  }, [sessionToken])
-
-  return <h1>Hello {profile?.name} (client)</h1>
+  return isSuccess ? <h1>Hello {data.payload.data.name} (client)</h1> : null
 }

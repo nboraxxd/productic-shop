@@ -1,8 +1,8 @@
 import http from '@/utils/http'
-import { MessageResponse, SuccessResponse } from '@/types'
+import { MessageResponse } from '@/types'
 import envVariables from '@/lib/schema-validations/env-variables.schema'
 import {
-  AuthDataResponseType,
+  AuthResponseType,
   LoginBodyType,
   RegisterBodyType,
   SetTokenBodyType,
@@ -10,15 +10,13 @@ import {
 
 const authApi = {
   // API OF BACKEND SERVER
-  registerFromBrowserToBackend: (body: RegisterBodyType) =>
-    http.post<SuccessResponse<AuthDataResponseType>>('/auth/register', body),
+  registerFromBrowserToBackend: (body: RegisterBodyType) => http.post<AuthResponseType>('/auth/register', body),
 
-  loginFromBrowserToBackend: (body: LoginBodyType) =>
-    http.post<SuccessResponse<AuthDataResponseType>>('/auth/login', body),
+  loginFromBrowserToBackend: (body: LoginBodyType) => http.post<AuthResponseType>('/auth/login', body),
 
   // API OF NEXT.JS SERVER
   setTokenFromBrowserToServer: (body: SetTokenBodyType) =>
-    http.post<SuccessResponse<MessageResponse>>('/api/auth/set-token', body, { baseUrl: envVariables.NEXT_PUBLIC_URL }),
+    http.post<MessageResponse>('/api/auth/set-token', body, { baseUrl: envVariables.NEXT_PUBLIC_URL }),
 }
 
 export default authApi
