@@ -1,8 +1,10 @@
 import omit from 'lodash/omit'
 
 import { addLeadingSlash, isBrowser } from '@/utils'
-import envVariables from '@/lib/schema-validations/env-variables.schema'
+import { HttpStatusCode, StatusCodeType } from '@/constants/http-status-code'
+import { EntityError, EntityErrorPayload, HttpError } from '@/utils/errors'
 import { AuthResponseType } from '@/lib/schema-validations/auth.schema'
+import envVariables from '@/lib/schema-validations/env-variables.schema'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string
@@ -11,20 +13,6 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 }
 
 type CustomOptionsExcluedBody = Omit<CustomOptions, 'body'>
-
-class HttpError extends Error {
-  status: number
-  payload: {
-    message: string
-    [key: string]: any
-  }
-
-  constructor({ status, payload }: { status: number; payload: any }) {
-    super('HTTP Error')
-    this.status = status
-    this.payload = payload
-  }
-}
 
 class SessionToken {
   private token: string | null = null
@@ -88,13 +76,22 @@ const request = async <T>(
   const payload: T = await response.json()
 
   const data = {
-    status: response.status,
+    statusCode: response.status as StatusCodeType,
     payload,
   }
 
   // Interceptors error
   if (!response.ok) {
-    throw new HttpError(data)
+    if (response.status === HttpStatusCode.UnprocessableEntity) {
+      const omittedPayload: EntityErrorPayload = omit(
+        payload as EntityErrorPayload & { statusCode: typeof HttpStatusCode.UnprocessableEntity },
+        'statusCode'
+      )
+
+      throw new EntityError(omittedPayload)
+    } else {
+      throw new HttpError(data)
+    }
   }
 
   // Interceptors response

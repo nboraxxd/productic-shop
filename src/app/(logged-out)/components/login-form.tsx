@@ -1,6 +1,5 @@
 'use client'
 
-import { toast } from 'sonner'
 import { Suspense } from 'react'
 import queryString from 'query-string'
 import { useForm } from 'react-hook-form'
@@ -12,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
+import { handleErrorApi } from '@/utils/errors'
 import { useAuthLoginMutation } from '@/app/(logged-out)/hooks'
 import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
@@ -45,18 +45,8 @@ function LoginFormWithoutSuspense() {
       router.refresh()
 
       form.reset()
-    } catch (error: any) {
-      const status = error.status
-
-      if (status === 422) {
-        const errors = error.payload?.errors as { field: string; message: string }[]
-
-        errors.forEach(({ field, message }) => {
-          form.setError(field as keyof LoginBodyType, { type: 'server', message })
-        })
-      } else {
-        toast.error(error.payload?.message || error.toString())
-      }
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
     }
   }
 
