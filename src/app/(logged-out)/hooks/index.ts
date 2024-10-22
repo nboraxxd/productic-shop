@@ -1,1 +1,1 @@
-export { useAuthLoginMutation, useAuthRegisterMutation, useSetTokenToServerMutation } from './use-auth'
+export { useLoginMutation, useRegisterMutation, useSetTokenToServerMutation, useLogoutMutation } from './use-auth'

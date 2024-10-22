@@ -48,7 +48,9 @@ const request = async <T>(
   url: string,
   options?: CustomOptions
 ) => {
-  const body = options?.body ? JSON.stringify(options.body) : undefined
+  // Dự án này backend yêu cầu Body cannot be empty when content-type is set to 'application/json'
+  // Nên nếu không có body thì body sẽ là {}
+  const body = JSON.stringify(options?.body || {})
 
   const baseHeaders: HeadersInit = {
     'Content-Type': 'application/json',
@@ -65,12 +67,12 @@ const request = async <T>(
 
   const response = await fetch(fullUrl, {
     ...omit(options, 'baseUrl', 'params', 'headers'),
-    body,
-    method,
     headers: {
       ...baseHeaders,
       ...options?.headers,
     },
+    body,
+    method,
   })
 
   const payload: T = await response.json()
@@ -97,7 +99,7 @@ const request = async <T>(
   // Interceptors response
   if (isBrowser && ['/auth/login', '/auth/register'].includes(addLeadingSlash(url))) {
     clientSessionToken.value = (payload as AuthResponseType).data.token
-  } else if (isBrowser && addLeadingSlash(url) === '/auth/logout') {
+  } else if (isBrowser && addLeadingSlash(url) === '/api/auth/logout') {
     clientSessionToken.value = null
   }
 

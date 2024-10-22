@@ -8,7 +8,7 @@ export function useSetTokenToServerMutation() {
   })
 }
 
-export function useAuthRegisterMutation() {
+export function useRegisterMutation() {
   const setTokenToServerMutation = useSetTokenToServerMutation()
 
   return useMutation({
@@ -26,7 +26,7 @@ export function useAuthRegisterMutation() {
   })
 }
 
-export function useAuthLoginMutation() {
+export function useLoginMutation() {
   const setTokenToServerMutation = useSetTokenToServerMutation()
 
   return useMutation({
@@ -41,5 +41,11 @@ export function useAuthLoginMutation() {
         token,
       })
     },
+  })
+}
+
+export function useLogoutMutation() {
+  return useMutation({
+    mutationFn: authApi.logoutFromBrowserToServer,
   })
 }

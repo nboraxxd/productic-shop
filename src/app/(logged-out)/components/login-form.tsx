@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
 import { handleErrorApi } from '@/utils/errors'
-import { useAuthLoginMutation } from '@/app/(logged-out)/hooks'
+import { useLoginMutation } from '@/app/(logged-out)/hooks'
 import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
@@ -33,7 +33,7 @@ function LoginFormWithoutSuspense() {
     },
   })
 
-  const authLoginMutation = useAuthLoginMutation()
+  const authLoginMutation = useLoginMutation()
 
   async function onValid(values: LoginBodyType) {
     if (authLoginMutation.isPending) return

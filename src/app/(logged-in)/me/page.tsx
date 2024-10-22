@@ -34,7 +34,7 @@ export default async function MePage() {
   }
 
   return (
-    <div>
+    <div className="container w-full">
       <h1>Hello {meData?.name} (server)</h1>
       <Button asChild>
         <Link href="/me/update">Update me</Link>
