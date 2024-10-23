@@ -15,14 +15,14 @@ const authApi = {
   loginFromBrowserToBackend: (body: LoginBodyType) => http.post<AuthResponseType>('/auth/login', body),
 
   logoutFromServerToBackend: (sessionToken: string) =>
-    http.post<MessageResponse>('/auth/logout', null, { headers: { Authorization: `Bearer ${sessionToken}` } }),
+    http.post<MessageResponse>('/auth/logout', {}, { headers: { Authorization: `Bearer ${sessionToken}` } }),
 
   // API FROM BROWSER TO SERVER NEXT.JS
   setTokenFromBrowserToServer: (body: SetTokenBodyType) =>
     http.post<MessageResponse>('/api/auth/set-token', body, { baseUrl: envVariables.NEXT_PUBLIC_URL }),
 
   logoutFromBrowserToServer: () =>
-    http.post<MessageResponse>('/api/auth/logout', null, { baseUrl: envVariables.NEXT_PUBLIC_URL }),
+    http.post<MessageResponse>('/api/auth/logout', {}, { baseUrl: envVariables.NEXT_PUBLIC_URL }),
 }
 
 export default authApi

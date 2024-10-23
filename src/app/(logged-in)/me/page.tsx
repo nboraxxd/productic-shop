@@ -26,11 +26,9 @@ export default async function MePage() {
 
     meData = result.payload.data
   } catch (err: any) {
-    // Chưa thể redirect sang /login ở đây được vì chưa có cơ chế tự động xoá session token
-    // Khi server trả về lỗi 401
-    // Tức là nếu redirect sang /login thì từ /login sẽ redirect lại /me do session token vẫn còn
-    console.log('🔥 ~ MePage ~ err:', err)
-    // redirect('/login')
+    if (err.digest?.includes('NEXT_REDIRECT')) {
+      throw err
+    }
   }
 
   return (

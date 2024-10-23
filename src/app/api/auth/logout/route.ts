@@ -16,6 +16,6 @@ export async function POST() {
 
     return Response.json(payload)
   } catch (_err) {
-    return Response.json({ message: 'Đăng xuất thành công. (Although server error)' })
+    return Response.json({ message: 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại. (server_error)' })
   }
 }

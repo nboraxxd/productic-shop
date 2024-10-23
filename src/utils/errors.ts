@@ -51,11 +51,13 @@ export const handleErrorApi = ({ error, setError }: { error: any; setError?: Use
     })
   } else if (error instanceof DOMException) {
     console.log('AbortError:', error.message)
+  } else if (error instanceof HttpError && error.statusCode === HttpStatusCode.Unauthorized) {
+    console.log('Unauthorized:', error.payload.message)
   } else {
     if (isBrowser) {
       toast.error(error.payload?.message || error.toString())
     } else {
-      console.log('🔥 ~ server ~ error:', error)
+      console.log('ServerError:', error)
     }
   }
 }

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
 import { handleErrorApi } from '@/utils/errors'
-import { useRegisterMutation } from '@/app/(logged-out)/hooks'
+import { useRegisterMutation } from '@/app/(logged-out)/hooks/use-auth'
 import { registerBodySchema, RegisterBodyType } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 

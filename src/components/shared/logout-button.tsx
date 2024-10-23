@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
-import { useLogoutMutation } from '@/app/(logged-out)/hooks'
+import { useLogoutMutation } from '@/app/(logged-in)/hooks/use-auth'
 
 export default function LogoutButton() {
   const logoutMutation = useLogoutMutation()

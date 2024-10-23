@@ -10,9 +10,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-
 import { handleErrorApi } from '@/utils/errors'
-import { useLoginMutation } from '@/app/(logged-out)/hooks'
+import { useLoginMutation } from '@/app/(logged-out)/hooks/use-auth'
 import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
@@ -43,8 +42,6 @@ function LoginFormWithoutSuspense() {
 
       router.push(next ? `${next}?${from}` : '/me')
       router.refresh()
-
-      form.reset()
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }

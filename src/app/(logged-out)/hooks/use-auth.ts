@@ -43,9 +43,3 @@ export function useLoginMutation() {
     },
   })
 }
-
-export function useLogoutMutation() {
-  return useMutation({
-    mutationFn: authApi.logoutFromBrowserToServer,
-  })
-}
