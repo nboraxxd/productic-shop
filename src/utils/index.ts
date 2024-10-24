@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { twMerge } from 'tailwind-merge'
 import { clsx, type ClassValue } from 'clsx'
+
 import { TokenPayload } from '@/types/jwt.types'
+import { clientSessionToken } from '@/utils/http'
+import { differenceInMinutes } from 'date-fns'
+import authApi from '@/api-requests/auth.api'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -25,4 +29,19 @@ export const decodeToken = (token: string) => {
  */
 export function addLeadingSlash(url: string) {
   return url.startsWith('/') ? url : `/${url}`
+}
+
+export async function checkAndSlideSessionToken() {
+  const sessionToken = clientSessionToken.value
+  if (!sessionToken) return
+
+  const now = new Date()
+  console.log('🚀 ~ check session: ', clientSessionToken.expiresAt)
+
+  if (!clientSessionToken.expiresAt || differenceInMinutes(new Date(clientSessionToken.expiresAt), now) < 1) {
+    const res = await authApi.slideSessionFromBrowserToServer()
+    console.log('🚀 ~ slideSession: ', res.payload.data.expiresAt)
+
+    clientSessionToken.expiresAt = res.payload.data.expiresAt
+  }
 }

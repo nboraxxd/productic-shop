@@ -3,8 +3,8 @@ import { cookies } from 'next/headers'
 import { Roboto } from 'next/font/google'
 
 import { Toaster } from '@/components/ui/sonner'
+import { Header, SlideSession } from '@/components/shared'
 import { TanstackQueryProvider, AuthProvider, ThemeProvider } from '@/components/provider'
-import { Header } from '@/components/shared'
 import '@/app/globals.css'
 
 export const metadata: Metadata = {
@@ -35,6 +35,7 @@ export default function RootLayout({
             <AuthProvider initialSessionToken={sessionToken?.value}>
               <Header />
               {children}
+              <SlideSession />
             </AuthProvider>
             <Toaster />
           </ThemeProvider>

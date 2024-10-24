@@ -17,7 +17,7 @@ type CustomOptionsExcluedBody = Omit<CustomOptions, 'body'>
 
 class SessionToken {
   private token: string | null = null
-  private _expiresAt = new Date().toISOString()
+  private _expiresAt: string | null = null
 
   get value() {
     return this.token
@@ -34,7 +34,7 @@ class SessionToken {
     return this._expiresAt
   }
 
-  set expiresAt(expiresAt: string) {
+  set expiresAt(expiresAt: string | null) {
     if (!isBrowser) {
       throw new Error('Cannot set expiresAt on server side')
     }
@@ -109,15 +109,14 @@ const request = async <T>(
           console.log('😰 clientLogoutRequest', error)
         } finally {
           clientSessionToken.value = null
+          clientSessionToken.expiresAt = null
+          clientLogoutRequest = null
           window.location.href = '/login'
         }
       }
 
       if (!isBrowser) {
-        // Đây là trường hợp khi mà access token của chúng ta còn hạn
-        // Và chúng ta gọi API ở Next.js server (route handler hoặc server component) đến server backend
         const sessionToken = options?.headers?.Authorization?.split('Bearer ')[1]
-
         redirect(`/logout?sessionToken=${sessionToken}`)
       }
 
@@ -130,8 +129,10 @@ const request = async <T>(
   // Interceptors response
   if (isBrowser && ['/auth/login', '/auth/register'].includes(addLeadingSlash(url))) {
     clientSessionToken.value = (payload as AuthResponseType).data.token
+    clientSessionToken.expiresAt = (payload as AuthResponseType).data.expiresAt
   } else if (isBrowser && addLeadingSlash(url) === '/api/auth/logout') {
     clientSessionToken.value = null
+    clientSessionToken.expiresAt = null
   }
 
   return data
