@@ -9,14 +9,14 @@ export async function POST(req: Request) {
   const cookieStore = cookies()
 
   try {
-    const parsedData = await setTokenBodySchema.parseAsync(body)
+    const { expiresAt, token } = await setTokenBodySchema.parseAsync(body)
 
-    cookieStore.set('sessionToken', parsedData.token, {
+    cookieStore.set('sessionToken', token, {
       path: '/',
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
-      expires: new Date(parsedData.expiresAt),
+      expires: new Date(expiresAt),
     })
 
     return Response.json({ message: 'Set token success' })

@@ -1,9 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { isBrowser } from '@/utils'
 import { clientSessionToken } from '@/utils/http'
+import { localStorageEventTarget } from '@/utils/local-storage'
 
 interface Props {
   children: React.ReactNode
@@ -16,6 +19,21 @@ export default function AuthProvider({ children, initialSessionToken }: Props) {
       clientSessionToken.value = initialSessionToken
     }
   })
+
+  const router = useRouter()
+
+  useEffect(() => {
+    function handleRemoveAuth() {
+      router.push('/login')
+      router.refresh()
+      toast.warning('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại. (force)')
+    }
+
+    localStorageEventTarget.addEventListener('removeAuth', handleRemoveAuth)
+    return () => {
+      localStorageEventTarget.removeEventListener('removeAuth', handleRemoveAuth)
+    }
+  }, [router])
 
   return children
 }

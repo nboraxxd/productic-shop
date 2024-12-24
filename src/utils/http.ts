@@ -2,6 +2,7 @@ import omit from 'lodash/omit'
 import { redirect } from 'next/navigation'
 
 import { addLeadingSlash, isBrowser } from '@/utils'
+import { localStorageEventTarget } from '@/utils/local-storage'
 import { EntityError, EntityErrorPayload, HttpError } from '@/utils/errors'
 import { HttpStatusCode, StatusCodeType } from '@/constants/http-status-code'
 import { AuthResponseType } from '@/lib/schema-validations/auth.schema'
@@ -96,10 +97,15 @@ const request = async <T>(
 
       throw new EntityError(omittedPayload)
     } else if (response.status === HttpStatusCode.Unauthorized) {
+      // clientLogoutRequest dùng để tránh việc gửi nhiều request logout cùng một lúc
       if (isBrowser && !clientLogoutRequest) {
+        // phải thực hiện thủ công gọi đến route handler logout bằng fetch
+        // đây là file cơ sở, không nên dùng các method trong api-requests
+        // vì các method trong api-requests dùng file cơ sở này
+        // gọi qua, gọi lại vậy sẽ gây ra chồng chéo import
         clientLogoutRequest = fetch('/api/auth/logout', {
           method: 'POST',
-          body: JSON.stringify({ force: true }),
+          body: null,
           headers: { ...baseHeaders },
         })
 
@@ -111,12 +117,11 @@ const request = async <T>(
           clientSessionToken.value = null
           clientSessionToken.expiresAt = null
           clientLogoutRequest = null
-          window.location.href = '/login'
-        }
-      }
 
-      if (!isBrowser) {
-        const sessionToken = options?.headers?.Authorization?.split('Bearer ')[1]
+          localStorageEventTarget.dispatchEvent(new Event('removeAuth'))
+        }
+      } else if (!isBrowser) {
+        const sessionToken = options?.headers?.Authorization?.split('Bearer ')[1] || ''
         redirect(`/logout?sessionToken=${sessionToken}`)
       }
 

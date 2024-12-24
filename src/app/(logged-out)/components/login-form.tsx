@@ -15,7 +15,7 @@ import { LoginBodyType, loginBodySchema } from '@/lib/schema-validations/auth.sc
 import { useLoginMutation } from '@/app/(logged-out)/hooks/use-auth'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
-function LoginFormWithoutSuspense() {
+function LoginFormContent() {
   const router = useRouter()
 
   const pathname = usePathname()
@@ -43,7 +43,7 @@ function LoginFormWithoutSuspense() {
       router.push(next ? `${next}?${from}` : '/me')
       router.refresh()
     } catch (error) {
-      handleErrorApi({ error, setError: form.setError })
+      handleErrorApi<LoginBodyType>({ error, setError: form.setError })
     }
   }
 
@@ -103,7 +103,7 @@ const loginFields = [
 export default function LoginForm() {
   return (
     <Suspense fallback={<AuthFormSkeleton itemList={loginFields} buttonLabel="Login" />}>
-      <LoginFormWithoutSuspense />
+      <LoginFormContent />
     </Suspense>
   )
 }

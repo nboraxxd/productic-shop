@@ -1,6 +1,5 @@
 'use client'
 
-import { toast } from 'sonner'
 import { LoaderCircleIcon } from 'lucide-react'
 import { Suspense, useEffect, useRef } from 'react'
 import { UseMutateAsyncFunction } from '@tanstack/react-query'
@@ -10,13 +9,12 @@ import { handleErrorApi } from '@/utils/errors'
 import { clientSessionToken } from '@/utils/http'
 import { useLogoutMutation } from '@/app/(logged-in)/hooks/use-auth'
 
-function LogoutPageWithoutSuspense() {
+function LogoutPageContent() {
   const logoutRef = useRef<UseMutateAsyncFunction | null>(null)
 
   const router = useRouter()
 
   const pathname = usePathname()
-  // const from = queryString.stringify({ from: pathname })
 
   const searchParams = useSearchParams()
   const sessionTokenFromUrl = searchParams.get('sessionToken')
@@ -31,7 +29,7 @@ function LogoutPageWithoutSuspense() {
         logoutRef.current = mutateAsync
 
         try {
-          const response = await mutateAsync()
+          await mutateAsync()
 
           clientSessionToken.value = null
 
@@ -39,7 +37,6 @@ function LogoutPageWithoutSuspense() {
           from.set('from', pathname)
           router.push(`/?${from}`)
           router.refresh()
-          toast.info(response.payload.message)
 
           timeout = setTimeout(() => {
             logoutRef.current = null
@@ -74,7 +71,7 @@ function LogoutView() {
 export default function LogoutPage() {
   return (
     <Suspense fallback={<LogoutView />}>
-      <LogoutPageWithoutSuspense />
+      <LogoutPageContent />
     </Suspense>
   )
 }

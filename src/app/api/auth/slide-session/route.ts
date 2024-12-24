@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-import { HttpError } from '@/utils/errors'
+import { HttpStatusCode } from '@/constants/http-status-code'
 import authApi from '@/api-requests/auth.api'
 
 export async function POST() {
@@ -24,11 +24,7 @@ export async function POST() {
     })
 
     return Response.json(payload, { status })
-  } catch (error) {
-    if (error instanceof HttpError) {
-      return Response.json(error.payload, { status: error.statusCode })
-    } else {
-      return Response.json({ message: 'Internal server error' }, { status: 500 })
-    }
+  } catch (error: any) {
+    return Response.json({ message: error.message || 'Unauthorized' }, { status: HttpStatusCode.Unauthorized })
   }
 }

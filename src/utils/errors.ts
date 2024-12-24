@@ -1,5 +1,6 @@
+import { z } from 'zod'
 import { toast } from 'sonner'
-import { UseFormSetError } from 'react-hook-form'
+import { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 
 import { isBrowser } from '@/utils'
 import { HttpStatusCode, StatusCodeType } from '@/constants/http-status-code'
@@ -44,10 +45,16 @@ export class EntityError extends HttpError {
   }
 }
 
-export const handleErrorApi = ({ error, setError }: { error: any; setError?: UseFormSetError<any> }) => {
+export const handleErrorApi = <T extends FieldValues>({
+  error,
+  setError,
+}: {
+  error: any
+  setError?: UseFormSetError<T>
+}) => {
   if (error instanceof EntityError && setError) {
     error.payload.errors.forEach(({ field, message }) => {
-      setError(field, { type: 'server', message })
+      setError(field as Path<T>, { type: z.ZodIssueCode.custom, message })
     })
   } else if (error instanceof DOMException) {
     console.log('AbortError:', error.message)

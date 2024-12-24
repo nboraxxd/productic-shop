@@ -16,7 +16,7 @@ import { useRegisterMutation } from '@/app/(logged-out)/hooks/use-auth'
 import { registerBodySchema, RegisterBodyType } from '@/lib/schema-validations/auth.schema'
 import { AuthFormSkeleton } from '@/app/(logged-out)/components'
 
-function RegisterFormWithoutSuspense() {
+function RegisterFormContent() {
   const router = useRouter()
 
   const pathname = usePathname()
@@ -48,7 +48,7 @@ function RegisterFormWithoutSuspense() {
 
       form.reset()
     } catch (error: any) {
-      handleErrorApi({ error, setError: form.setError })
+      handleErrorApi<RegisterBodyType>({ error, setError: form.setError })
     }
   }
 
@@ -145,7 +145,7 @@ const registerFields = [
 export default function RegisterForm() {
   return (
     <Suspense fallback={<AuthFormSkeleton itemList={registerFields} buttonLabel="Login" />}>
-      <RegisterFormWithoutSuspense />
+      <RegisterFormContent />
     </Suspense>
   )
 }
