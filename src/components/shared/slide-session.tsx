@@ -34,11 +34,14 @@ export default function SlideSession() {
       }, 1000)
     }
 
+    // Thời gian hết hạn của session token là 1 tiếng
+    // Cứ mỗi 5 phút sẽ kiểm tra session token và slide nếu cần
+    // Nếu expiredAt - now < 10 phút thì sẽ slide session token
     const interval = setInterval(async () => {
       checkAndSlideSessionToken({
         onError,
       })
-    }, ms('20s'))
+    }, ms('5m'))
 
     return () => {
       if (timeout) clearTimeout(timeout)

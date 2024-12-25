@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 
 import authApi from '@/api-requests/auth.api'
+import { useAuthStore } from '@/app/(logged-in)/stores/auth-store'
 
 export function useSetTokenToServerMutation() {
   return useMutation({
@@ -9,6 +10,7 @@ export function useSetTokenToServerMutation() {
 }
 
 export function useRegisterMutation() {
+  const setIsAuth = useAuthStore((state) => state.setIsAuth)
   const setTokenToServerMutation = useSetTokenToServerMutation()
 
   return useMutation({
@@ -22,11 +24,13 @@ export function useRegisterMutation() {
         expiresAt,
         token,
       })
+      setIsAuth(true)
     },
   })
 }
 
 export function useLoginMutation() {
+  const setIsAuth = useAuthStore((state) => state.setIsAuth)
   const setTokenToServerMutation = useSetTokenToServerMutation()
 
   return useMutation({
@@ -40,6 +44,7 @@ export function useLoginMutation() {
         expiresAt,
         token,
       })
+      setIsAuth(true)
     },
   })
 }

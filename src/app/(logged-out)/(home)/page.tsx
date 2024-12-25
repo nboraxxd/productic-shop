@@ -5,6 +5,7 @@ import { VercelLogoIcon } from '@radix-ui/react-icons'
 
 import { Button } from '@/components/ui/button'
 import { LogoutButton } from '@/components/shared'
+import { WelcomeMessage } from '@/app/(logged-out)/(home)/_components'
 
 export const metadata: Metadata = {
   title: 'Homepage',
@@ -21,7 +22,7 @@ export default async function HomePage() {
         <VercelLogoIcon className="size-10 text-pink-500" />
         Next free
       </h1>
-      {sessionToken ? <p>You are logged in</p> : <p>You are not logged in</p>}
+      {sessionToken ? <WelcomeMessage /> : <p>You are not logged in</p>}
 
       <div className="flex items-center gap-2">
         <Button asChild>

@@ -28,7 +28,9 @@ export async function checkAndSlideSessionToken(params?: { onSuccess?: () => voi
 
   const now = new Date()
 
-  if (!expiresAt || differenceInMinutes(new Date(expiresAt), now) < 1) {
+  // Trường hợp không có expiresAt là trường hợp vừa vào trang web, cần slide session token
+  // Trường hợp expiresAt - now < 10 phút cũng cần slide session token
+  if (!expiresAt || differenceInMinutes(new Date(expiresAt), now) < 10) {
     try {
       const res = await authApi.slideSessionFromBrowserToServer()
 

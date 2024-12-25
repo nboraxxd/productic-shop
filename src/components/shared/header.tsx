@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { VercelLogoIcon } from '@radix-ui/react-icons'
 import { ModeToggle } from '@/components/shared'
+import { WelcomeMessage } from '@/app/(logged-out)/(home)/_components'
 
 export default function Header() {
   return (
@@ -16,7 +17,7 @@ export default function Header() {
           <VercelLogoIcon className="size-6" />
         </Link>
       </Button>
-
+      <WelcomeMessage />
       <ModeToggle />
     </header>
   )
