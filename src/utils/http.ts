@@ -55,12 +55,9 @@ const request = async <T>(
   options?: CustomOptions
 ) => {
   // Dự án này backend yêu cầu Body cannot be empty when content-type is set to 'application/json'
-  const body = options?.body ? JSON.stringify(options.body) : undefined
+  const body = options?.body instanceof FormData ? options.body : JSON.stringify(options?.body)
 
-  const baseHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-    Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : '',
-  }
+  const baseHeaders: HeadersInit = options?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
 
   // Nếu không truyền base URL thì mặc định sẽ là backend endpoint
   const baseUrl = options?.baseUrl || envVariables.NEXT_PUBLIC_API_ENDPOINT
@@ -69,6 +66,10 @@ const request = async <T>(
   const queryString = searchParams.toString() ? `?${searchParams.toString()}` : ''
 
   const fullUrl = `${baseUrl}${addLeadingSlash(url)}${queryString}`
+
+  if (isBrowser && clientSessionToken.value) {
+    baseHeaders.Authorization = `Bearer ${clientSessionToken.value}`
+  }
 
   const response = await fetch(fullUrl, {
     ...omit(options, 'baseUrl', 'params', 'headers'),

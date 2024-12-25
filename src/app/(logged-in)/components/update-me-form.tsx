@@ -60,7 +60,7 @@ export default function UpdateMeForm({ me }: { me: AccountDataResponseType }) {
         />
 
         {/* Button */}
-        <Button type="submit" disabled={false} className="mt-2 w-fit">
+        <Button type="submit" disabled={updateMeMutation.isPending} className="mt-2 w-fit">
           Submit
         </Button>
       </form>
