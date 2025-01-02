@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-import { clientSessionToken } from '@/utils/http'
 import { AccountDataResponseType } from '@/lib/schema-validations/account.schema'
 import { isBrowser } from '@/utils'
+import { getSessionTokenFromLocalStorage } from '@/utils/local-storage'
 
 type AuthStore = {
   isAuth: boolean
@@ -15,7 +15,7 @@ type AuthStore = {
 export const useAuthStore = create<AuthStore>()(
   devtools(
     (set) => ({
-      isAuth: Boolean(clientSessionToken.value),
+      isAuth: Boolean(getSessionTokenFromLocalStorage()),
       setIsAuth: (isAuth) => set({ isAuth }),
       me: null,
       setMe: (me) => set({ me }),

@@ -1,29 +1,16 @@
 'use client'
 
 import { toast } from 'sonner'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { isBrowser } from '@/utils'
-import { clientSessionToken } from '@/utils/http'
 import { localStorageEventTarget } from '@/utils/local-storage'
-import { useAuthStore } from '@/app/(logged-in)/stores/auth-store'
 
 interface Props {
   children: React.ReactNode
-  initialSessionToken?: string
 }
 
-export default function AuthProvider({ children, initialSessionToken }: Props) {
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
-
-  useState(() => {
-    if (isBrowser && initialSessionToken) {
-      clientSessionToken.value = initialSessionToken
-      setIsAuth(true)
-    }
-  })
-
+export default function AuthProvider({ children }: Props) {
   const router = useRouter()
 
   useEffect(() => {

@@ -2,7 +2,12 @@ import omit from 'lodash/omit'
 import { redirect } from 'next/navigation'
 
 import { addLeadingSlash, isBrowser } from '@/utils'
-import { localStorageEventTarget } from '@/utils/local-storage'
+import {
+  getSessionTokenFromLocalStorage,
+  removeTokensFromLocalStorage,
+  setSessionTokenExpiresAtToLocalStorage,
+  setSessionTokenToLocalStorage,
+} from '@/utils/local-storage'
 import { EntityError, EntityErrorPayload, HttpError } from '@/utils/errors'
 import { HttpStatusCode, StatusCodeType } from '@/constants/http-status-code'
 import { AuthResponseType } from '@/lib/schema-validations/auth.schema'
@@ -15,35 +20,6 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 }
 
 type CustomOptionsExcluedBody = Omit<CustomOptions, 'body'>
-
-class SessionToken {
-  private token: string | null = null
-  private _expiresAt: string | null = null
-
-  get value() {
-    return this.token
-  }
-
-  set value(token: string | null) {
-    if (!isBrowser) {
-      throw new Error('Cannot set token on server side')
-    }
-    this.token = token
-  }
-
-  get expiresAt() {
-    return this._expiresAt
-  }
-
-  set expiresAt(expiresAt: string | null) {
-    if (!isBrowser) {
-      throw new Error('Cannot set expiresAt on server side')
-    }
-    this._expiresAt = expiresAt
-  }
-}
-
-export const clientSessionToken = new SessionToken()
 
 // Phải đưa clientLogoutRequest vào global scope
 // vì nếu đặt trong hàm request thì mỗi lần request sẽ tạo ra một clientLogoutRequest mới
@@ -67,8 +43,9 @@ const request = async <T>(
 
   const fullUrl = `${baseUrl}${addLeadingSlash(url)}${queryString}`
 
-  if (isBrowser && clientSessionToken.value) {
-    baseHeaders.Authorization = `Bearer ${clientSessionToken.value}`
+  if (isBrowser) {
+    const accessToken = getSessionTokenFromLocalStorage()
+    if (accessToken) baseHeaders.Authorization = `Bearer ${accessToken}`
   }
 
   const response = await fetch(fullUrl, {
@@ -115,11 +92,8 @@ const request = async <T>(
         } catch (error) {
           console.log('😰 clientLogoutRequest', error)
         } finally {
-          clientSessionToken.value = null
-          clientSessionToken.expiresAt = null
+          removeTokensFromLocalStorage(true)
           clientLogoutRequest = null
-
-          localStorageEventTarget.dispatchEvent(new Event('removeAuth'))
         }
       } else if (!isBrowser) {
         const sessionToken = options?.headers?.Authorization?.split('Bearer ')[1] || ''
@@ -134,11 +108,10 @@ const request = async <T>(
 
   // Interceptors response
   if (isBrowser && ['/auth/login', '/auth/register'].includes(addLeadingSlash(url))) {
-    clientSessionToken.value = (payload as AuthResponseType).data.token
-    clientSessionToken.expiresAt = (payload as AuthResponseType).data.expiresAt
+    setSessionTokenToLocalStorage((payload as AuthResponseType).data.token)
+    setSessionTokenExpiresAtToLocalStorage((payload as AuthResponseType).data.expiresAt)
   } else if (isBrowser && addLeadingSlash(url) === '/api/auth/logout') {
-    clientSessionToken.value = null
-    clientSessionToken.expiresAt = null
+    removeTokensFromLocalStorage()
   }
 
   return data

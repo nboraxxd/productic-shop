@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { Roboto } from 'next/font/google'
 
 import { baseOpenGraph } from '@/constants/shared-metadata'
@@ -30,15 +29,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const cookieStore = cookies()
-  const sessionToken = cookieStore.get('sessionToken')
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.className} ${roboto.variable} antialiased`}>
         <TanstackQueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <AuthProvider initialSessionToken={sessionToken?.value}>
+            <AuthProvider>
               <Header />
               {children}
               <SlideSession />

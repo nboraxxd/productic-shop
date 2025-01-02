@@ -6,8 +6,8 @@ import { UseMutateAsyncFunction } from '@tanstack/react-query'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { handleErrorApi } from '@/utils/errors'
-import { clientSessionToken } from '@/utils/http'
 import { useLogoutMutation } from '@/app/(logged-in)/hooks/use-auth'
+import { getSessionTokenFromLocalStorage } from '@/utils/local-storage'
 
 function LogoutPageContent() {
   const logoutRef = useRef<UseMutateAsyncFunction | null>(null)
@@ -24,14 +24,12 @@ function LogoutPageContent() {
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null
 
-    if (!logoutRef.current && sessionTokenFromUrl === clientSessionToken.value) {
+    if (!logoutRef.current && sessionTokenFromUrl === getSessionTokenFromLocalStorage()) {
       ;(async () => {
         logoutRef.current = mutateAsync
 
         try {
           await mutateAsync()
-
-          clientSessionToken.value = null
 
           const from = new URLSearchParams()
           from.set('from', pathname)

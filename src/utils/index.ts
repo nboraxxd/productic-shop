@@ -1,9 +1,13 @@
 import { twMerge } from 'tailwind-merge'
 import { clsx, type ClassValue } from 'clsx'
 
-import { clientSessionToken } from '@/utils/http'
 import { differenceInMinutes } from 'date-fns'
 import authApi from '@/api-requests/auth.api'
+import {
+  getSessionTokenExpiresAtFromLocalStorage,
+  getSessionTokenFromLocalStorage,
+  setSessionTokenExpiresAtToLocalStorage,
+} from '@/utils/local-storage'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,8 +25,8 @@ export function addLeadingSlash(url: string) {
 }
 
 export async function checkAndSlideSessionToken(params?: { onSuccess?: () => void; onError?: () => void }) {
-  const sessionToken = clientSessionToken.value
-  const expiresAt = clientSessionToken.expiresAt
+  const sessionToken = getSessionTokenFromLocalStorage()
+  const expiresAt = getSessionTokenExpiresAtFromLocalStorage()
 
   if (!sessionToken) return
 
@@ -34,7 +38,7 @@ export async function checkAndSlideSessionToken(params?: { onSuccess?: () => voi
     try {
       const res = await authApi.slideSessionFromBrowserToServer()
 
-      clientSessionToken.expiresAt = res.payload.data.expiresAt
+      setSessionTokenExpiresAtToLocalStorage(res.payload.data.expiresAt)
       params?.onSuccess?.()
     } catch (_error) {
       params?.onError?.()
