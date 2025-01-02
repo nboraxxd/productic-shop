@@ -6,7 +6,7 @@ export default function useDeleteProductMutation() {
   return useMutation({
     mutationFn: productApi.deleteProductFromBrowserToBackend,
     onSuccess: async () => {
-      await revalidateApi('products')
+      await revalidateApi.revalidateTag('products')
     },
   })
 }

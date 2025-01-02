@@ -7,7 +7,7 @@ import productApi from '@/api-requests/product.api'
 
 import { Button } from '@/components/ui/button'
 import { Heading } from '@/components/shared'
-import { DeleteProductBtn } from '@/app/products/_components'
+import { ProductCommands } from '@/app/products/_components'
 
 export const metadata: Metadata = {
   title: 'Products',
@@ -45,11 +45,7 @@ export default async function ProductsPage() {
                 <Button variant={'outline'} asChild>
                   <Link href={`/products/${product.id}`}>View</Link>
                 </Button>
-
-                <Button variant={'outline'} asChild>
-                  <Link href={`/products/edit/${product.id}`}>Edit</Link>
-                </Button>
-                <DeleteProductBtn productId={product.id} />
+                <ProductCommands productId={product.id} />
               </div>
             </div>
           </div>

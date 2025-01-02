@@ -1,5 +1,6 @@
 'use client'
 
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -28,7 +29,9 @@ export default function UpdateMeForm({ me }: { me: AccountDataResponseType }) {
     if (updateMeMutation.isPending) return
 
     try {
-      await updateMeMutation.mutateAsync(data)
+      const response = await updateMeMutation.mutateAsync(data)
+
+      toast.success(response.payload.message)
       router.refresh()
     } catch (error) {
       handleErrorApi({ error })

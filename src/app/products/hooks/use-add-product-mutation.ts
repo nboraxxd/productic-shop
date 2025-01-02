@@ -6,7 +6,7 @@ export default function useAddProductMutation() {
   return useMutation({
     mutationFn: productApi.addProductFromBrowserToBackend,
     onSuccess: async () => {
-      await revalidateApi('products')
+      await revalidateApi.revalidateTag('products')
     },
   })
 }

@@ -39,7 +39,6 @@ export default function ProductForm({ product }: { product?: ProductResponseType
   const image = form.watch('image')
 
   async function onSubmit(values: AddProductBodyType) {
-    console.log('🔥 ~ onSubmit ~ values:', values, file)
     if (addProductMutation.isPending) return
 
     try {

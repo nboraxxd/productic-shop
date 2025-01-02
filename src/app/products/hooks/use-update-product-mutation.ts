@@ -7,8 +7,13 @@ export default function useUpdateProductMutation() {
   return useMutation({
     mutationFn: ({ id, ...rest }: UpdateProductBodyType & { id: number }) =>
       productApi.updateProductFromBrowserToBackend(id, rest),
-    onSuccess: async () => {
-      await revalidateApi('products')
+    onSuccess: async ({
+      payload: {
+        data: { id },
+      },
+    }) => {
+      await revalidateApi.revalidateTag('products')
+      await revalidateApi.revalidateTag(`products/${id}`)
     },
   })
 }

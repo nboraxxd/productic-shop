@@ -11,7 +11,7 @@ const productApi = {
   // API of backend server
   getProducts: () => http.get<ProductsResponseType>('/products', { next: { tags: ['products'] } }),
 
-  getProduct: (id: number) => http.get<ProductResponseType>(`/products/${id}`),
+  getProduct: (id: number) => http.get<ProductResponseType>(`/products/${id}`, { next: { tags: [`products/${id}`] } }),
 
   addProductFromBrowserToBackend: (body: AddProductBodyType) => http.post<ProductResponseType>('/products', body),
 

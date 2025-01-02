@@ -1,20 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useGetMeQuery } from '@/app/(logged-in)/hooks/use-account'
 import { useAuthStore } from '@/app/(logged-in)/stores/auth-store'
+import useIsClient from '@/app/(logged-out)/hooks/use-is-client'
+
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function WelcomeMessage() {
-  const [mounted, setMounted] = useState(false)
-
   const isAuth = useAuthStore((state) => state.isAuth)
+  const isClient = useIsClient()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return <Skeleton className="h-6 w-60" />
+  if (!isClient) return <Skeleton className="h-6 w-60" />
 
   return isAuth ? <WelcomeMessageContent /> : <p>You are not logged in</p>
 }
